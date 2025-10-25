@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Secret Forever</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80'>💖</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #fff1eb 0%, #fce4ec 100%);
+            color: #5d1a2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+        .hearts {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        .heart {
+            position: absolute;
+            font-size: 1.8em;
+            color: rgba(255, 105, 180, 0.8);
+            animation: floatUp 6s infinite linear;
+            opacity: 0.9;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(-150px) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .image-card {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto 20px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transition: transform 0.4s ease;
+        }
+        .image-card:hover { transform: scale(1.03); }
+        .image-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #form-container, #reveal, #failure {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+            backdrop-filter: blur(8px);
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 64, 129, 0.2);
+        }
+        #form-container:hover, #reveal:hover, #failure:hover { transform: translateY(-6px); }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #e91e63;
+            font-size: 2.6em;
+            margin-bottom: 14px;
+            text-shadow: 0 2px 6px rgba(233,30,99,0.3);
+        }
+        p { margin: 12px 0; font-size: 1.15em; line-height: 1.6; }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 14px 0;
+            border: 2px solid #ff4081;
+            border-radius: 14px;
+            font-size: 16px;
+            background: #fff8f8;
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: #e91e63;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(233,30,99,0.3);
+            transform: scale(1.02);
+        }
+        input[type="password"] {
+            font-family: 'Roboto', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff4081, #e91e63);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(233,30,99,0.4);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #e91e63, #ff1744);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(233,30,99,0.5);
+        }
+        .try-again-btn {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            margin-top: 20px;
+        }
+        .try-again-btn:hover {
+            background: linear-gradient(135deg, #45a049, #4caf50);
+        }
+
+        #reveal, #failure { display: none; animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        ol {
+            text-align: left;
+            padding-left: 22px;
+            margin: 22px 0;
+            font-size: 1.2em;
+            line-height: 1.85;
+        }
+        ol li::marker { color: #ff4081; font-weight: bold; font-size: 1.3em; }
+        ol li { margin-bottom: 8px; }
+
+        .final-note {
+            font-style: italic;
+            color: #c2185b;
+            font-size: 1.3em;
+            margin-top: 30px;
+            font-family: 'Pacifico', cursive;
+            text-shadow: 0 1px 3px rgba(194,24,91,0.2);
+        }
+
+        /* Failure Page Styles */
+        #failure h1 {
+            color: #f44336;
+            font-size: 2.4em;
+        }
+        #failure p {
+            color: #757575;
+            font-size: 1.1em;
+        }
+        .quotes {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .quote {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 4px solid #ff4081;
+            font-style: italic;
+            font-size: 1em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .quote:hover {
+            transform: translateY(-2px);
+        }
+        .teddy-image {
+            max-width: 200px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(244,67,54,0.3);
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.2em; }
+            .image-card, .teddy-image { max-width: 100%; }
+            #form-container, #reveal, #failure { padding: 24px; }
+            .quotes { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Hearts -->
+    <div class="hearts"></div>
+
+    <div class="container">
+
+        <!-- First Watercolor Candlelight Image: Form Section -->
+        <div class="image-card">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...[TRUNCATED - PASTE YOUR FULL BASE64 HERE]..." alt="Romantic anniversary card in soft candlelight glow">
+        </div>
+
+        <!-- Login Form -->
+        <div id="form-container">
+            <h1>Crack the Code to Our Hearts! 🔐💖</h1>
+            <p><strong>My eternal flame,</strong> this vault holds the essence of us... but only the true whispers of our love can open it. Dare to unlock? The challenge is ours alone. 😏</p>
+            <input type="password" id="password" placeholder="Our enchanted date (Oct 28 – the day fate smiled) 🔒">
+            <input type="text" id="name" placeholder="The name that dances on my lips every sunrise... what I call my world 💋">
+            <input type="text" id="fun-fact" placeholder="That electric memory where our souls collided... the spark that never fades ⚡">
+            <button onclick="attemptUnlock()">Challenge Accepted – Unlock!</button>
+        </div>
+
+        <!-- Failure Page: Crying Teddy Bear & Motivational Quotes -->
+        <div id="failure">
+            <img src="https://www.pikpng.com/pngl/m/283-2834213_cuddlebug-teddy-bear-emoji-stickers-messages-sticker-sad.png" alt="Crying Teddy Bear" class="teddy-image">
+            <h1>Oh No... The Vault Stays Sealed! 😢</h1>
+            <p><strong>My daring love,</strong> so close, yet the stars tease us a little longer. This teddy's tears? Just a reminder of how deeply we feel. Dig deeper – the treasure awaits your perfect key. You've got this; our forever depends on it! 🏆</p>
+            <div class="quotes">
+                <div class="quote">"The heart knows the way. Run in that direction." – Rumi</div>
+                <div class="quote">"Every heartbeat is a chance to remember what truly matters – us."</div>
+                <div class="quote">"Love's greatest adventures begin with a single, brave try. One more?"</div>
+                <div class="quote">"You're closer than you think, my muse. The name I cherish? It's etched in every dawn."</div>
+            </div>
+            <button class="try-again-btn" onclick="resetChallenge()">Try Again – I'm Rooting for You! 🌟</button>
+        </div>
+
+        <!-- Reveal Section -->
+        <div id="reveal">
+            <div class="image-card" style="margin-bottom: 20px;">
+                <img src="data:image/png;base64,YOUR_SECOND_WATERCOLOR_IMAGE_BASE64_HERE" alt="Anniversary love letter envelope">
+            </div>
+            <h1>Victory! Happy 1-Year Anniversary, Agbeke! 🌟💖</h1>
+            <p><strong>You did it, my Agbeke – the queen of my every whisper!</strong> Surprise! This wasn't just a game... it was our love story, coded in challenges only we could conquer. You <em>are</em> the ultimate prize, the fire that lights my universe.</p>
+            <p>These <strong>12 epic reasons</strong>—forged in the fires of our year together—prove why you're my unbeatable champion:</p>
+            <ol>
+                <li>Your smile? A supernova that outshines galaxies, pulling me from the void.</li>
+                <li>Your laugh – a symphony that turns ordinary moments into legends.</li>
+                <li>Your kindness, a superpower that heals with a glance, unseen but unbreakable.</li>
+                <li>Our epic quests, where danger becomes delight in your fearless embrace.</li>
+                <li>The blaze in your soul over [her passion] – it sets my world ablaze too.</li>
+                <li>Silent battles won in your gaze, where no words are needed to claim victory.</li>
+                <li>Your warrior spirit – my shield, my sword, my eternal inspiration.</li>
+                <li>Our late-night sieges of secrets, conquering doubts one confession at a time.</li>
+                <li>Those hidden talismans of love you plant – each a conquest over distance.</li>
+                <li>Your unshakeable alliance in my quests – turning dreams to triumphs.</li>
+                <li>We clash and conquer as one – fate's fiercest, flawless duo.</li>
+                <li>Our saga's next chapter? An endless odyssey, victorious and yours truly.</li>
+            </ol>
+            <p class="final-note">You slayed the challenge, Agbeke – now let's conquer the night. Oct 28 forever. I love you fiercely, boundlessly. Come claim your real reward... me. 💋</p>
+        </div>
+    </div>
+
+    <script>
+        // Keys to victory
+        const CORRECT_PASSWORD = "Oct 28";
+        const CORRECT_NAME = "Agbeke";
+
+        // Floating hearts (intensified for the quest!)
+        function createHearts() {
+            const container = document.querySelector('.hearts');
+            for (let i = 0; i < 25; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = ['💖','💕','💗','🩷','💝'][Math.floor(Math.random()*5)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.animationDuration = (6 + Math.random() * 6) + 's';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        // Attempt to unlock
+        function attemptUnlock() {
+            const password = document.getElementById('password').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const fact = document.getElementById('fun-fact').value.trim();
+
+            if (!password || !name || !fact) {
+                alert("Arm yourself fully, champion – every field is a weapon in our quest! ⚔️");
+                return;
+            }
+
+            if (password !== CORRECT_PASSWORD || name !== CORRECT_NAME) {
+                // Failure: Show crying teddy page
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('failure').style.display = 'block';
+                // Gentle confetti "tears" for drama
+                confetti({
+                    particleCount: 50,
+                    angle: 90,
+                    spread: 45,
+                    origin: { y: 0.8 },
+                    colors: ['#f44336', '#ef5350', '#e57373'],
+                    shapes: ['circle']
+                });
+                return;
+            }
+
+            // Triumph! Show reveal
+            document.querySelector('#reveal h1').innerHTML = `Victory! Happy 1-Year Anniversary, ${name}! 🌟💖`;
+
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('failure').style.display = 'none';
+            document.getElementById('reveal').style.display = 'block';
+
+            // Victory confetti storm
+            const colors = ['#ff4081', '#e91e63', '#ffccbc', '#fce4ec', '#f8bbd9'];
+            const end = Date.now() + 2500;
+            (function frame() {
+                confetti({ 
+                    particleCount: 10, 
+                    angle: 60, 
+                    spread: 70, 
+                    origin: { x: 0 }, 
+                    colors,
+                    shapes: ['heart']
+                });
+                confetti({ 
+                    particleCount: 10, 
+                    angle: 120, 
+                    spread: 70, 
+                    origin: { x: 1 }, 
+                    colors,
+                    shapes: ['heart']
+                });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            })();
+        }
+
+        // Reset to form
+        function resetChallenge() {
+            document.getElementById('failure').style.display = 'none';
+            document.getElementById('form-container').style.display = 'block';
+            // Clear fields for fresh start
+            document.getElementById('password').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('fun-fact').value = '';
+            // Motivational sparkle
+            confetti({
+                particleCount: 30,
+                spread: 60,
+                origin: { y: 0.7 },
+                colors: ['#4caf50', '#81c784', '#a5d6a7']
+            });
+        }
+    </script>
+</body>
+              </html>
